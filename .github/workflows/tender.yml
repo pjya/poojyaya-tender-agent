@@ -24,3 +24,6 @@ jobs:
 
     - name: Run Tender Script
       run: python tender_agent.py
+      env:
+        EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+
