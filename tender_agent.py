@@ -89,26 +89,51 @@ karnataka_keywords = [
 # ==============================
 
 # ==============================
-# FETCH TENDERS (DEBUG MODE)
+# FETCH & FILTER TENDERS
 # ==============================
 
 valid_tenders = []
-all_entries = []
+
+allowed_domains = [
+    "gov.in",
+    "nic.in",
+    "karnataka.gov.in",
+    "gem.gov.in",
+    "ac.in",
+    "org"
+]
+
+tender_keywords = [
+    "tender", "bid", "e-proc", "quotation",
+    "rfp", "eoi", "contract"
+]
 
 for feed_url in rss_feeds:
     feed = feedparser.parse(feed_url)
 
     for entry in feed.entries:
-        title = entry.title
-        link = entry.link
+        title = entry.title.lower()
+        link = entry.link.lower()
 
-        all_entries.append((title, link))
+        # Domain whitelist
+        if not any(domain in link for domain in allowed_domains):
+            continue
 
-# DEBUG: Print total entries found
-print("Total entries fetched from RSS:", len(all_entries))
+        # Must contain tender-related keyword
+        if not any(t in title for t in tender_keywords):
+            continue
 
-# Temporarily send ALL entries without filtering
-valid_tenders = all_entries
+        # Must contain security or manpower keyword
+        if not (
+            any(s in title for s in security_keywords) or
+            any(m in title for m in manpower_keywords)
+        ):
+            continue
+
+        valid_tenders.append((entry.title, entry.link))
+
+# Remove duplicates
+valid_tenders = list(set(valid_tenders))
 
 
 # ==============================
