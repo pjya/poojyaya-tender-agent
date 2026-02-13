@@ -88,22 +88,28 @@ karnataka_keywords = [
 # FETCH TENDERS
 # ==============================
 
+# ==============================
+# FETCH TENDERS (DEBUG MODE)
+# ==============================
+
 valid_tenders = []
-yesterday = datetime.now() - timedelta(days=1)
+all_entries = []
 
 for feed_url in rss_feeds:
     feed = feedparser.parse(feed_url)
 
     for entry in feed.entries:
-        title = entry.title.lower()
+        title = entry.title
         link = entry.link
 
-        if any(k in title for k in karnataka_keywords):
-            if any(s in title for s in security_keywords) or any(m in title for m in manpower_keywords):
-                valid_tenders.append((entry.title, link))
+        all_entries.append((title, link))
 
-# Remove duplicates
-valid_tenders = list(set(valid_tenders))
+# DEBUG: Print total entries found
+print("Total entries fetched from RSS:", len(all_entries))
+
+# Temporarily send ALL entries without filtering
+valid_tenders = all_entries
+
 
 # ==============================
 # CREATE EMAIL BODY
